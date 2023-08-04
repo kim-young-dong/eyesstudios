@@ -1,0 +1,36 @@
+{
+  "family": "eyes-live",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::102647667075:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "eyes-live",
+      "image": "102647667075.dkr.ecr.ap-northeast-2.amazonaws.com/eyes-live:latests",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "eyes/live",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "eyes/live",
+          "awslogs-create-group": "true"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 3000,
+          "protocol": "tcp",
+          "containerPort": "3000"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "wget --no-verbose --spider http://localhost:3000/health || exit 1"
+        ]
+      }
+    }
+  ]
+}
