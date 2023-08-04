@@ -19,8 +19,8 @@ let eyeMeshes: THREE.Mesh[] = []
 const clock = new THREE.Clock()
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, aspectRatio.value, 0.1, 1000)
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 2)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 const gltfLoader = new GLTFLoader()
 
 let moveForward = false
@@ -34,7 +34,7 @@ const direction = new THREE.Vector3()
 async function setEyeMeshes() {
   await new Promise((resolve, reject) => {
     gltfLoader.load(
-      "./src/assets/models/eye.glb",
+      "https://ksenia-k.com/models/eye-realistic.glb",
       (gltf: any) => {
         const eyeMesh = gltf.scene.children[2]
         eyeMesh.scale.set(300, 300, 300)
@@ -128,8 +128,6 @@ function updateRenderer() {
 }
 
 function setRenderer() {
-  console.log("setRenderer")
-
   if (!canvas3D.value) return
   floorMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(1000, 1000, 10, 10),
@@ -223,6 +221,7 @@ div.game-doc {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   background-color: rgba(255, 228, 196, 0.503);
   width: 100%;
   height: 100%;
