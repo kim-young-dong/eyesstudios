@@ -4,11 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:ecs:ap-northeast-2:550254634269:task-definition/eyes-live:1",
+  "executionRoleArn": "ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "eyes-live",
-      "image": "550254634269.dkr.ecr.ap-northeast-2.amazonaws.com/eyes-live:latests",
+      "image": "550254634269.dkr.ecr.ap-northeast-2.amazonaws.com/eyes-live:latest",
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
