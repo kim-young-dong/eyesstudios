@@ -1,14 +1,10 @@
 {
   "family": "eyes-live",
   "networkMode": "awsvpc",
-  "compatibilities": ["EC2", "FARGATE"],
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "taskRoleArn": "arn:aws:iam::550254634269:role/ecsTaskExecutionRole",
   "executionRoleArn": "arn:aws:iam::550254634269:role/ecsTaskExecutionRole",
-  "revision": 7,
-  "status": "ACTIVE",
   "containerDefinitions": [
     {
       "name": "eyes-live",
@@ -17,10 +13,8 @@
       "portMappings": [
         {
           "name": "eyes-live-3000-tcp",
-          "containerPort": 3000,
           "hostPort": 3000,
-          "protocol": "tcp",
-          "appProtocol": "http"
+          "protocol": "tcp"
         }
       ],
       "essential": true,
@@ -33,36 +27,13 @@
           "awslogs-stream-prefix": "ecs"
         },
         "secretOptions": []
+      },
+      "healthcheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3
       }
-    }
-  ],
-  "requiresAttributes": [
-    {
-      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-    },
-    {
-      "name": "ecs.capability.execution-role-awslogs"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.ecr-auth"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.task-iam-role"
-    },
-    {
-      "name": "ecs.capability.execution-role-ecr-pull"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-    },
-    {
-      "name": "ecs.capability.task-eni"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
     }
   ]
 }
