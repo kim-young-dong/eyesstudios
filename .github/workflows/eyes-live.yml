@@ -34,6 +34,7 @@ env:
   AWS_REGION: ap-northeast-2 # set this to your preferred AWS region, e.g. us-west-1
   NAME: eyes-live # set this to your application name
   ECS_CLUSTER: eyes-live # set this to your Amazon ECS cluster name
+  ECS_SERVICE: eyes-live # set this to your Amazon ECS service name
   ECS_TASK_DEFINITION:
     ./eyes-live.json # set this to the path to your Amazon ECS task definition
     # file, e.g. .aws/task-definition.json
@@ -101,6 +102,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.NAME }}
+          service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
