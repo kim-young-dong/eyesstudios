@@ -1,36 +1,68 @@
 {
   "family": "eyes-live",
   "networkMode": "awsvpc",
+  "compatibilities": ["EC2", "FARGATE"],
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::550254634269:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::550254634269:role/ecsTaskExecutionRole",
+  "revision": 7,
+  "status": "ACTIVE",
   "containerDefinitions": [
     {
       "name": "eyes-live",
       "image": "550254634269.dkr.ecr.ap-northeast-2.amazonaws.com/eyes-live:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "eyes-live-3000-tcp",
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "eyes/live",
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/",
           "awslogs-region": "ap-northeast-2",
-          "awslogs-stream-prefix": "eyes/live",
-          "awslogs-create-group": "true"
-        }
-      },
-      "portMappings": [
-        {
-          "hostPort": 3000,
-          "protocol": "tcp",
-          "containerPort": "3000"
-        }
-      ],
-      "healthCheck": {
-        "command": [
-          "CMD-SHELL",
-          "wget --no-verbose --spider http://localhost:3000/health || exit 1"
-        ]
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
       }
+    }
+  ],
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
     }
   ]
 }
