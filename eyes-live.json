@@ -17,6 +17,12 @@
           "protocol": "tcp"
         }
       ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "wget --no-verbose --spider http://localhost:3000/api/version || exit 1"
+        ]
+      },
       "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
