@@ -15,7 +15,7 @@
           "name": "eyes-live-3000-tcp",
           "protocol": "tcp",
           "hostPort": 3000,
-          "containerPort": "3000"
+          "containerPort": 3000
         }
       ],
       "healthCheck": {
@@ -24,17 +24,7 @@
           "wget --no-verbose --spider http://localhost:3000/api/version || exit 1"
         ]
       },
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-create-group": "true",
-          "awslogs-group": "/ecs/",
-          "awslogs-region": "ap-northeast-2",
-          "awslogs-stream-prefix": "ecs"
-        },
-        "secretOptions": []
-      }
+      "essential": true
     }
   ]
 }
