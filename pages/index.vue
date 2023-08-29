@@ -22,6 +22,8 @@ const camera = new THREE.PerspectiveCamera(75, aspectRatio.value, 0.1, 1000)
 const ambientLight = new THREE.AmbientLight(0xffffff, 2)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 const gltfLoader = new GLTFLoader()
+const raycaster = new THREE.Raycaster()
+let intersects: THREE.Intersection[] = []
 
 let moveForward = false
 let moveBackward = false
@@ -64,12 +66,22 @@ async function setEyeMeshes() {
   }
 }
 
+function setIntersect() {
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera)
+  intersects = raycaster.intersectObjects(eyeMeshes)
+  if (intersects.length > 0) {
+    eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
+    scene.remove(intersects[0].object)
+  }
+}
+
 // keyEvent
 function pointerLock() {
   if (!canvas3D.value) return
   canvas3D.value.requestPointerLock()
   document.addEventListener("keydown", onKeyDown)
   document.addEventListener("keyup", onKeyUp)
+  document.addEventListener("click", setIntersect)
   controls.lock()
 }
 
@@ -126,7 +138,6 @@ function updateRenderer() {
   renderer.setSize(width.value, height.value)
   renderer.render(scene, camera)
 }
-
 function setRenderer() {
   if (!canvas3D.value) return
   floorMesh = new THREE.Mesh(
@@ -168,18 +179,6 @@ const loop = () => {
     if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta
 
     eyeMeshes.forEach((mesh) => {
-      // const random = Math.floor(Math.random() * 10) - 5
-      // let x = mesh.position.x
-      // let y = mesh.position.y
-      // let z = mesh.position.z
-      // x += Math.sin(Math.floor(time)) * speed
-      // y += Math.sin(Math.floor(time)) * speed
-      // z += Math.sin(Math.floor(time)) * speed
-
-      // mesh.position.set(x, y, z)
-      // mesh.rotation.x += 0.1 * random
-      // mesh.rotation.y += 0.1 * random
-      // mesh.rotation.z += 0.1 * random
       mesh.lookAt(camera.position)
     })
 
