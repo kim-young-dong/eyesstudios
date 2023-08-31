@@ -6,12 +6,15 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js"
 import { useWindowSize } from "@vueuse/core"
 
+// 윈도우 크기와 캔버스 관련 설정
 const { width, height } = useWindowSize()
 const aspectRatio = computed(() => width.value / height.value)
 
+// 3D 캔버스와 컨트롤러 관련 설정
 const canvas3D: Ref<HTMLCanvasElement | null> = ref(null)
 let isLocked = ref(false)
 
+// Three.js 관련 변수
 let controls: PointerLockControls
 let renderer: THREE.WebGLRenderer
 let eyeMesh: THREE.Mesh
@@ -20,19 +23,16 @@ const floorMesh = new THREE.Mesh(
   new THREE.PlaneGeometry(1000, 1000, 10, 10),
   new THREE.MeshBasicMaterial({ color: "#fff", wireframe: true })
 )
-floorMesh.rotateX(-Math.PI / 2)
-floorMesh.position.set(0, -5, 0)
-
 const clock = new THREE.Clock()
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, aspectRatio.value, 0.1, 1000)
-camera.rotation.x = 0.5
 const ambientLight = new THREE.AmbientLight(0xffffff, 2)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 const gltfLoader = new GLTFLoader()
 const raycaster = new THREE.Raycaster()
 let intersects: THREE.Intersection[] = []
 
+// Player Movement 관련 변수
 let moveForward = false
 let moveBackward = false
 let moveLeft = false
@@ -40,10 +40,11 @@ let moveRight = false
 const velocity = new THREE.Vector3()
 const direction = new THREE.Vector3()
 
+// Score & Time
 let score = ref(0)
-let timer = ref(60)
+let time = ref(60)
 
-// Eyes
+// Eyes Mesh Setting
 async function setEyeMeshes() {
   await new Promise((resolve, reject) => {
     gltfLoader.load(
@@ -76,10 +77,25 @@ async function setEyeMeshes() {
     eyeMeshes.push(mesh)
   }
 }
+
+// 게임 플레이 관련 함수
+function gameTimer() {
+  if (time.value === 0) {
+    alert(`Game Over! Your Score: ${score.value}`)
+    time.value = 60
+    score.value = 0
+    return
+  }
+  if (isLocked.value) {
+    setTimeout(gameTimer, 1000)
+    time.value -= 1
+  }
+}
 function targetHit() {
   eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
   scene.remove(intersects[0].object)
   score.value += 100
+  time.value += 5
 }
 function setIntersect() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera)
@@ -89,18 +105,15 @@ function setIntersect() {
   }
 }
 
-function playGame() {
-  setIntersect()
-}
-
 // keyEvent
 function pointerLock() {
   if (!canvas3D.value) return
   canvas3D.value.requestPointerLock()
   document.addEventListener("keydown", onKeyDown)
   document.addEventListener("keyup", onKeyUp)
-  document.addEventListener("click", playGame)
+  document.addEventListener("click", setIntersect)
   controls.lock()
+  setTimeout(gameTimer, 1000)
 }
 
 function onKeyDown(event: KeyboardEvent) {
@@ -150,18 +163,26 @@ function onKeyUp(event: KeyboardEvent) {
   }
 }
 
+// 씬 초기화
+function initScene() {
+  directionalLight.position.set(0, 1, 5)
+  floorMesh.rotateX(-Math.PI / 2)
+  floorMesh.position.set(0, -5, 0)
+  camera.rotation.x = 0.5
+  scene.background = new THREE.Color(0x000000)
+  scene.add(ambientLight, directionalLight, camera, floorMesh)
+}
+
+// 렌더러 업데이트
 function updateRenderer() {
   camera.aspect = aspectRatio.value
   camera.updateProjectionMatrix()
   renderer.setSize(width.value, height.value)
   renderer.render(scene, camera)
 }
+// 렌더러 초기화
 function setRenderer() {
   if (!canvas3D.value) return
-  scene.background = new THREE.Color(0x000000)
-  directionalLight.position.set(0, 1, 5)
-  scene.add(ambientLight, directionalLight, camera, floorMesh)
-
   renderer = new THREE.WebGLRenderer({ canvas: canvas3D.value, alpha: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio))
 
@@ -175,6 +196,7 @@ function setRenderer() {
   updateRenderer()
 }
 
+// 렌더링 루프
 const loop = () => {
   requestAnimationFrame(loop)
   const delta = clock.getDelta()
@@ -201,6 +223,7 @@ const loop = () => {
   updateRenderer()
 }
 onMounted(() => {
+  initScene()
   setEyeMeshes()
   setRenderer()
   loop()
@@ -211,7 +234,7 @@ onMounted(() => {
   <div class="container">
     <div v-show="isLocked" class="crose-scope">+</div>
     <div class="score-board">
-      <div>Time: {{ timer }}</div>
+      <div>Time: {{ time }}</div>
       <div>Score: {{ score }}</div>
     </div>
     <canvas class="game-board" @keypress="onKeyDown($event)" ref="canvas3D" />
