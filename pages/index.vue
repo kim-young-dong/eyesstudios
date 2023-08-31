@@ -3,7 +3,7 @@ import { onMounted, ref, computed } from "vue"
 import type { Ref } from "vue"
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
-import { PointerLockControls } from "three/addons/controls/PointerLockControls.js"
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js"
 import { useWindowSize } from "@vueuse/core"
 
 const { width, height } = useWindowSize()
@@ -14,11 +14,19 @@ let isLocked = ref(false)
 
 let controls: PointerLockControls
 let renderer: THREE.WebGLRenderer
-let eyeMesh: THREE.Mesh, floorMesh: THREE.Mesh
+let eyeMesh: THREE.Mesh
 let eyeMeshes: THREE.Mesh[] = []
+const floorMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(1000, 1000, 10, 10),
+  new THREE.MeshBasicMaterial({ color: "#fff", wireframe: true })
+)
+floorMesh.rotateX(-Math.PI / 2)
+floorMesh.position.set(0, -5, 0)
+
 const clock = new THREE.Clock()
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, aspectRatio.value, 0.1, 1000)
+camera.rotation.x = 0.5
 const ambientLight = new THREE.AmbientLight(0xffffff, 2)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 const gltfLoader = new GLTFLoader()
@@ -31,6 +39,9 @@ let moveLeft = false
 let moveRight = false
 const velocity = new THREE.Vector3()
 const direction = new THREE.Vector3()
+
+let score = ref(0)
+let timer = ref(60)
 
 // Eyes
 async function setEyeMeshes() {
@@ -65,14 +76,21 @@ async function setEyeMeshes() {
     eyeMeshes.push(mesh)
   }
 }
-
+function targetHit() {
+  eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
+  scene.remove(intersects[0].object)
+  score.value += 100
+}
 function setIntersect() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera)
   intersects = raycaster.intersectObjects(eyeMeshes)
   if (intersects.length > 0) {
-    eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
-    scene.remove(intersects[0].object)
+    targetHit()
   }
+}
+
+function playGame() {
+  setIntersect()
 }
 
 // keyEvent
@@ -81,7 +99,7 @@ function pointerLock() {
   canvas3D.value.requestPointerLock()
   document.addEventListener("keydown", onKeyDown)
   document.addEventListener("keyup", onKeyUp)
-  document.addEventListener("click", setIntersect)
+  document.addEventListener("click", playGame)
   controls.lock()
 }
 
@@ -140,12 +158,6 @@ function updateRenderer() {
 }
 function setRenderer() {
   if (!canvas3D.value) return
-  floorMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000, 10, 10),
-    new THREE.MeshBasicMaterial({ color: "#fff", wireframe: true })
-  )
-  floorMesh.rotateX(-Math.PI / 2)
-  floorMesh.position.set(0, -5, 0)
   scene.background = new THREE.Color(0x000000)
   directionalLight.position.set(0, 1, 5)
   scene.add(ambientLight, directionalLight, camera, floorMesh)
@@ -196,32 +208,58 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <canvas @keypress="onKeyDown($event)" ref="canvas3D" />
-    <div @click="pointerLock" v-show="!isLocked" class="game-doc">
+  <div class="container">
+    <div v-show="isLocked" class="crose-scope">+</div>
+    <div class="score-board">
+      <div>Time: {{ timer }}</div>
+      <div>Score: {{ score }}</div>
+    </div>
+    <canvas class="game-board" @keypress="onKeyDown($event)" ref="canvas3D" />
+    <div @click="pointerLock" v-show="!isLocked" class="game-rules">
       <p>Click to Play</p>
-      <div class="doc">
+      <div class="rules">
         <p>Move: WASD</p>
-        <p>View: Mouse</p>
+        <p>Control: Mouse</p>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-canvas {
+.container {
+  // width: 100%;
+  // height: 100%;
+  position: relative;
+}
+.score-board {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: red;
+  z-index: 1;
+}
+.game-board {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100dvw;
-  height: 100dvh;
 }
-div.game-doc {
+.crose-scope {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  color: hotpink;
+  z-index: 1;
+}
+.game-rules {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 228, 196, 0.503);
+  background-color: rgba(0, 0, 0, 0.503);
   width: 100%;
   height: 100%;
   position: fixed;
@@ -231,7 +269,8 @@ div.game-doc {
   p {
     font-size: 24px;
     font-weight: bold;
-    color: red;
+    color: rgb(255, 0, 0);
+    text-align: center;
   }
 }
 </style>
