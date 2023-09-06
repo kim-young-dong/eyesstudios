@@ -42,7 +42,7 @@ const direction = new THREE.Vector3()
 
 // Score & Time
 let score = ref(0)
-let time = ref(60)
+let time = ref(100)
 
 // Eyes Mesh Setting
 async function setEyeMeshes() {
@@ -82,7 +82,7 @@ async function setEyeMeshes() {
 function gameTimer() {
   if (time.value === 0) {
     alert(`Game Over! Your Score: ${score.value}`)
-    time.value = 60
+    time.value = 100
     score.value = 0
     return
   }
@@ -95,7 +95,12 @@ function targetHit() {
   eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
   scene.remove(intersects[0].object)
   score.value += 100
-  time.value += 5
+
+  if (time.value >= 97) {
+    time.value = 100
+    return
+  }
+  time.value += 3
 }
 function setIntersect() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera)
