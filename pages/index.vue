@@ -5,6 +5,7 @@ import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js"
 import { useWindowSize } from "@vueuse/core"
+import gunfire from "../static/sounds/gunfire.mp3"
 
 // 윈도우 크기와 캔버스 관련 설정
 const { width, height } = useWindowSize()
@@ -23,6 +24,7 @@ const floorMesh = new THREE.Mesh(
   new THREE.PlaneGeometry(1000, 1000, 10, 10),
   new THREE.MeshBasicMaterial({ color: "#fff", wireframe: true })
 )
+let gunSound: HTMLAudioElement
 const clock = new THREE.Clock()
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, aspectRatio.value, 0.1, 1000)
@@ -92,6 +94,8 @@ function gameTimer() {
   }
 }
 function targetHit() {
+  gunSound.currentTime = 0
+  gunSound.play()
   eyeMeshes = eyeMeshes.filter((mesh) => mesh !== intersects[0].object)
   scene.remove(intersects[0].object)
   score.value += 100
@@ -198,6 +202,7 @@ function setRenderer() {
   controls.addEventListener("unlock", () => {
     isLocked.value = false
   })
+  gunSound = new Audio(gunfire)
   updateRenderer()
 }
 
