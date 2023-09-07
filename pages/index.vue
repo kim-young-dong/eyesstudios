@@ -102,9 +102,18 @@ function targetHit() {
 
   if (time.value >= 97) {
     time.value = 100
-    return
+  } else {
+    time.value += 3
   }
-  time.value += 3
+
+  if (eyeMeshes.length === 0) {
+    alert(`Game Clear! Restart? Your Score: ${score.value}`)
+    controls.unlock()
+    time.value = 100
+    score.value = 0
+    eyeMeshes = []
+    setEyeMeshes()
+  }
 }
 function setIntersect() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera)
