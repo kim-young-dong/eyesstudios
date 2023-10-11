@@ -241,7 +241,6 @@ const loop = () => {
 
   updateRenderer()
 }
-useFetch("/api/test")
 onMounted(() => {
   initScene()
   setEyeMeshes()
