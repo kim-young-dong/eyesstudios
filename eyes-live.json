@@ -13,9 +13,9 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/aws/ecs/containerinsights/eyes-live-cluster/performance",
+          "awslogs-group": "eyesstudios.com",
           "awslogs-region": "ap-northeast-2",
-          "awslogs-stream-prefix": "/aws/ecs/containerinsights/eyes-live-cluster/performance",
+          "awslogs-stream-prefix": "eyesstudios",
           "awslogs-create-group": "true"
         }
       },
