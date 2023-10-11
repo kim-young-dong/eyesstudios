@@ -241,8 +241,8 @@ const loop = () => {
 
   updateRenderer()
 }
+useFetch("/api/test")
 onMounted(() => {
-  console.log("mounted")
   initScene()
   setEyeMeshes()
   setRenderer()
