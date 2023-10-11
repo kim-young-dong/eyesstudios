@@ -10,6 +10,15 @@
       "name": "eyes-live",
       "image": "550254634269.dkr.ecr.ap-northeast-2.amazonaws.com/eyes-live:latest",
       "cpu": 0,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/containerinsights/eyes-live-cluster/performance",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "/aws/ecs/containerinsights/eyes-live-cluster/performance",
+          "awslogs-create-group": "true"
+        }
+      },
       "portMappings": [
         {
           "name": "eyes-live-3000-tcp",
