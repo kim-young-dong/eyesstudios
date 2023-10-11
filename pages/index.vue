@@ -242,6 +242,7 @@ const loop = () => {
   updateRenderer()
 }
 onMounted(() => {
+  console.log("mounted")
   initScene()
   setEyeMeshes()
   setRenderer()
