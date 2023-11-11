@@ -262,11 +262,11 @@ onMounted(() => {
     <div v-show="!isLocked" class="game-rules">
       <div v-if="isLoding">Loding...</div>
       <div v-else>
-        <p class="playButton" @click="pointerLock">Click to Play</p>
         <div class="rules">
           <p>Move: WASD</p>
           <p>Control: Mouse</p>
         </div>
+        <p class="playButton" @click="pointerLock">Click to Play</p>
       </div>
     </div>
   </div>
